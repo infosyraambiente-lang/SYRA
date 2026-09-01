@@ -1,0 +1,24 @@
+{
+  "name": "SyRA Gestión Interna",
+  "short_name": "SyRA",
+  "description": "Sistema interno de control operativo, visitas y seguimiento de SyRA.",
+  "start_url": "/SYRA/gestion.html",
+  "scope": "/SYRA/",
+  "display": "standalone",
+  "background_color": "#f3f7f8",
+  "theme_color": "#087f92",
+  "icons": [
+    {
+      "src": "/SYRA/logosolo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/SYRA/logo-syra.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
