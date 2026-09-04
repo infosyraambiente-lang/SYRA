@@ -1,4 +1,4 @@
-const CACHE_NAME = "syra-v1";
+const CACHE_NAME = "syra-v2-monitoreos";
 const APP_SHELL = [
   "/SYRA/gestion.html",
   "/SYRA/operario.html",
