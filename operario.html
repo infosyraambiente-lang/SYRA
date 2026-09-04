@@ -395,6 +395,7 @@
           </div>
           <div class="field"><label>Número de registro</label><input id="registro" placeholder="RNPUD / T.I. / registro SENASA" /></div>
           <div class="field"><label>Hoja de seguridad del producto</label><input id="hojaseguridad" type="url" placeholder="Enlace al PDF guardado en Drive" /></div>
+          <div class="field"><label>¿Hoja de seguridad entregada al cliente?</label><select id="sdsentregada"><option>Pendiente</option><option>Sí</option><option>No</option></select></div>
           <div class="status"><b>Declaración:</b> se utilizarán únicamente productos autorizados o registrados ante ANMAT o SENASA, según corresponda, respetando rótulo, concentración, dosis y medidas de seguridad.</div>
           <div class="field">
             <label>Recomendación / acción correctiva</label
@@ -611,6 +612,7 @@
           autoridad: val("autoridad"),
           numeroRegistro: val("registro"),
           hojaSeguridad: val("hojaseguridad"),
+          sdsEntregadaCliente: val("sdsentregada"),
           correctiva: val("correctiva"),
           plano: val("plano"),
         };
