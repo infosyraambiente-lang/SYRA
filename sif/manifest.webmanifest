@@ -1,0 +1,5 @@
+{
+ "id":"/SYRA/sif/", "name":"SyRA-SIF Campo y Auditoría", "short_name":"SyRA-SIF", "description":"Visitas de campo con dictado, evidencias, monitoreo codificado y auditoría",
+ "start_url":"/SYRA/sif/", "scope":"/SYRA/sif/", "display":"standalone", "background_color":"#f4f8fa", "theme_color":"#087f92",
+ "icons":[{"src":"../logosolo.png","sizes":"any","type":"image/png","purpose":"any"},{"src":"../logo-syra.png","sizes":"any","type":"image/png","purpose":"any"}]
+}
