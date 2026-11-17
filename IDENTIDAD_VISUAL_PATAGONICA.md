@@ -5,6 +5,8 @@ Vigente desde el 17 de noviembre de 2026.
 Toda nueva sección de la web, pieza comercial o campaña de SyRA debe conservar referencias reconocibles y respetuosas de Comodoro Rivadavia, Chubut y la Patagonia. Evitar paisajes tropicales o vegetación genérica que no corresponda al territorio.
 
 ## Marca y color
+- Logotipo canónico: `logosolo.png` existente en la raíz del repositorio. Es el único símbolo que debe usarse en la web; jamás redibujarlo ni pedir a un generador de imágenes que lo imite. Usar el archivo original como elemento gráfico independiente.
+- Las imágenes generadas para fondos o campañas deben ser paisajes sin texto ni logos integrados; la marca real se superpone desde el sitio.
 - Conservar el nombre y logo originales de SyRA; no sustituirlos por los de otra empresa.
 - Servicios sanitarios y manejo integrado de plagas: azul/turquesa institucional del sitio.
 - Sanidad vegetal, arbolado y espacios verdes: verde hoja (#286b40), con el mismo sistema tipográfico del sitio.
