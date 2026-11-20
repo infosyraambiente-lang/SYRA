@@ -81,7 +81,9 @@ function guardar_(v,photos) {
       if(!existing.hasNext()){folderPhotos.createFile(imageBlob_(f.data,fname));count++}
     });
     // Historial raw auditable; incluye IDs y datos de OT. Las fotos quedan en archivos independientes.
-    let json=file_(folderVisit,'VISITA_'+v.id+'.json',JSON.stringify({formato:'syra-sif-v2',visita:v,fotos:photos.map(f=>({id:f.id,punto:f.punto,codigo:f.codigo,nombre:f.nombre,fecha:f.fecha}))},null,2),'application/json');
+    let copia=JSON.parse(JSON.stringify(v));
+    if(copia.adjuntos){for(let tipo of ['orden','factura']){if(copia.adjuntos[tipo])delete copia.adjuntos[tipo].datos}}
+    let json=file_(folderVisit,'VISITA_'+v.id+'.json',JSON.stringify({formato:'syra-sif-v2',visita:copia,fotos:photos.map(f=>({id:f.id,punto:f.punto,codigo:f.codigo,nombre:f.nombre,fecha:f.fecha}))},null,2),'application/json');
     if(v.adjuntos){
       for(let tipo of ['orden','factura']){
         let a=v.adjuntos[tipo];
@@ -126,7 +128,7 @@ function consolidarMensual_(sheet,folderClient,periodo,cliente) {
   body.appendParagraph('Cliente: '+cliente+' | Período: '+periodo);
   let allApproved=matches.every(r=>r[9]==='Aprobado por RT');
   body.appendParagraph(allApproved?'ESTADO: APROBADO (DECLARADO POR RT)':'BORRADOR · PENDIENTE DE REVISIÓN Y APROBACIÓN TÉCNICA');
-  body.appendParagraph('Documento único del período: '+matches.length+' intervenciones. Evidencias completas en carpetas codificadas de Drive.');
+  body.appendParagraph('Documento único del período: '+matches.length+' intervenciones. Evidencias originales y anexos en carpetas codificadas de Drive.');body.appendParagraph('RESUMEN EJECUTIVO').setHeading(DocumentApp.ParagraphHeading.HEADING2);body.appendParagraph('Se presentan las intervenciones efectivamente registradas, hallazgos, lecturas de dispositivos, acciones realizadas y recomendaciones por unidad. No interpretar ausencia de captura como ausencia absoluta de plagas.');
   matches.forEach((row,i)=>{
     let raw=JSON.parse(DriveApp.getFileById(row[11]).getBlob().getDataAsString()),v=raw.visita;
     body.appendParagraph((i+1)+'. '+(v.tipoServicio||'Servicio')+' | '+(v.unidadTipo||'Establecimiento')+' '+(v.unidadNumero||'')+' | '+v.fecha).setHeading(DocumentApp.ParagraphHeading.HEADING2);
@@ -149,16 +151,22 @@ function consolidarMensual_(sheet,folderClient,periodo,cliente) {
     body.appendParagraph('INTERPRETACIÓN TÉCNICA: '+(v.interpretacion||'Pendiente'));
     body.appendParagraph('RECOMENDACIONES Y CONCLUSIONES: '+(v.recomendaciones||'Pendiente'));
     // Fotos de evidencia hasta 2 por punto dentro del informe; originales completos en Drive.
-    const orderFolder=DriveApp.getFolderByIdFromUrl ? null : null;
+    
     let folderUrl=row[10],folderId=(String(folderUrl).match(/[-\w]{25,}/)||[])[0];
     if(folderId) {
       let fldr=DriveApp.getFolderById(folderId),phs=fldr.getFoldersByName('FOTOS_CODIFICADAS');
       if(phs.hasNext()) {
-        let it=phs.next().getFiles(),n=0;
-        while(it.hasNext()&&n<Math.min(18,2*(v.puntos||[]).length)){
-          let f=it.next();
-          try {let img=body.appendImage(f.getBlob());let w=img.getWidth(),h=img.getHeight();if(w>260){img.setWidth(260);img.setHeight(Math.round(h*260/w))}n++}catch(err){console.warn('Foto no incrustada '+err.message)}
-        }
+        let it=phs.next().getFiles(),allPhotos=[];
+        while(it.hasNext())allPhotos.push(it.next());
+        (v.puntos||[]).forEach(p=>{
+          let code=nombre_(p.codigo||'');
+          let selection=allPhotos.filter(f=>f.getName().endsWith('_'+code+'.jpg')).slice(0,3);
+          if(selection.length)body.appendParagraph('Evidencia: '+String(p.codigo||'')).setHeading(DocumentApp.ParagraphHeading.HEADING3);
+          selection.forEach(f=>{
+            try{let img=body.appendImage(f.getBlob());let w=img.getWidth(),h=img.getHeight();if(w>260){img.setWidth(260);img.setHeight(Math.round(h*260/w))}}
+            catch(err){console.warn('Foto no incrustada '+err.message)}
+          });
+        });
       }
     }
   });
