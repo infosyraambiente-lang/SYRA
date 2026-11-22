@@ -1,7 +1,7 @@
 /* SyRA Agua · Anteproyecto de riego · 22-11-2026 · sin dependencias remotas ni IA */
 'use strict';
 const $=id=>document.getElementById(id);
-const keys=['proyecto','cesped','personas','domestico','descargas','inodoroBase','inodoroEfic','cisterna','lluviaAnual','dias','eto','kc','kl','pe','ea','eg','awc','inf','plantas','goteros','qgot','qrot','fjar','fces','rzces','rzjar','diametro','longitud','bar','estatica','filtro','valvula','otras','friccion'];
+const keys=['proyecto','cesped','personas','domestico','fuente','descargas','inodoroBase','inodoroEfic','cisterna','lluviaAnual','dias','eto','kc','kl','pe','ea','eg','awc','inf','plantas','goteros','qgot','qrot','fjar','fces','rzces','rzjar','diametro','longitud','bar','estatica','filtro','valvula','otras','friccion'];
 const n=id=>{let v=Number($(id)?.value);return Number.isFinite(v)?v:0};
 const fmt=(v,d=1)=>Number.isFinite(v)?v.toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
 const ars=v=>Number.isFinite(v)?'$ '+v.toLocaleString('es-AR',{maximumFractionDigits:0}):'—';
@@ -40,6 +40,9 @@ function calcular(){
  $('wcMetrics').innerHTML='<div><strong>'+fmt(wcAhorro,1)+' m³/mes</strong><span>Ahorro del inodoro eficiente</span></div>';
 
  const etaCes=eto*kc,etaJar=eto*kl;
+ const lluviaRecuperable=casas*n('lluviaAnual')/1000*.8;
+ $('lluviaTecho').innerHTML='<div><strong>'+fmt(lluviaRecuperable,1)+' m³/año</strong><span>Potencial teórico de captación de las dos cubiertas (rendimiento supuesto 80 %)</span></div>';
+
  $('balanceMetrics').innerHTML=[
   ['ETc césped',fmt(etaCes,2)+' mm/día'],['ETL jardín',fmt(etaJar,2)+' mm/día'],['Riego del predio',fmt(vc+vj,1)+' m³/mes'],['Total con viviendas',fmt(total,1)+' m³/mes']
  ].map(([t,v])=>'<div><strong>'+v+'</strong><span>'+t+'</span></div>').join('');
@@ -71,6 +74,7 @@ function calcular(){
  const pHead=n('bar')*10.197,ht=pHead+n('estatica')+n('filtro')+n('valvula')+n('otras')+hf,kw=1000*9.81*Q*ht/1000,etaPump=.45;
  $('bombaMetrics').innerHTML=[['Caudal crítico',fmt(qmax,2)+' m³/h'],['Velocidad troncal',fmt(v,2)+' m/s'],['Pérdida por fricción',fmt(hf,1)+' m c.a.'],['Altura total requerida',fmt(ht,1)+' m c.a.']].map(([t,val])=>'<div><strong>'+val+'</strong><span>'+t+'</span></div>').join('');
  $('descripcionHidraulica').innerHTML='<p>Presión en emisor: '+fmt(pHead,1)+' m + desnivel '+fmt(n('estatica'),1)+' m + filtro '+fmt(n('filtro'),1)+' m + válvula '+fmt(n('valvula'),1)+' m + accesorios '+fmt(n('otras'),1)+' m + fricción '+fmt(hf,1)+' m = <b>'+fmt(ht,1)+' m de columna de agua</b> (aprox. '+fmt(ht/10.197,2)+' bar en impulsión). Potencia hidráulica '+fmt(kw,2)+' kW; con rendimiento global supuesto del 45 %, potencia eléctrica aproximada '+fmt(kw/etaPump,2)+' kW. Elegir bomba sólo después de comparar su curva Q–H, tensión, punto operativo real y protecciones.</p><p class="muted">Conducción «1 pulgada» y conexiones «media pulgada» son denominaciones comerciales; el diámetro interior real depende del material y presión nominal. Para el modelo se utiliza D='+fmt(n('diametro'),0)+' mm y L='+fmt(n('longitud'),0)+' m en tramo crítico. Accesorios de PE, cruces, tees y codos deben presupuestarse según plano definitivo.</p>';
+ $('descripcionHidraulica').innerHTML+='<p class="muted"><b>Para goteo:</b> válvula reductora y regulador de presión, filtro apropiado para goteros, purga en extremos y verificación de presión mínima de la bomba cuando funciona sólo un sector de '+fmt(qd,2)+' m³/h. <b>PGV 1″:</b> el fabricante declara 0,05–9 m³/h y aproximadamente 0,11–0,13 bar de pérdida alrededor de los caudales de este ejemplo. La pérdida editada de válvula incluye margen preliminar.</p>';
  const items=[['Programador Hunter X-Core XC-401i',1,183500,'https://www.pdaweb.com.ar/productos/?brand=Hunter'],['Electroválvulas Hunter PGV 1″ 24 VCA',4,46500,'https://www.puntoriego.com.ar/productos/'],['Rotores Hunter PGP Ultra (cuerpo)',12,28000,'https://www.puntoriego.com.ar/productos/']];
  $('presupuesto').innerHTML=table(['Equipo de referencia','Cantidad','Precio unitario','Subtotal'],items.map(([label,cant,price,url])=>['<a href="'+url+'" target="_blank" rel="noopener">'+label+'</a>',cant,ars(price),ars(price*cant)]).concat([['<b>Subtotal parcial</b>','—','—','<b>'+ars(items.reduce((sum,x)=>sum+x[1]*x[2],0))+'</b>']]));
  $('presupuesto').innerHTML+='<p class="tip">Aún no cotizados: <b>bomba, filtro, colector, tuberías 1″ y ramales, uniones, codos, tees, conexiones ½″, goteros (aprox. '+fmt(2*p*g,0)+'), cableado, relé de bomba, gabinete, accesorios, cisterna, transporte e instalación</b>. Tampoco se verificó el modelo específico de boquilla de PGP Ultra que aporte la relación de caudales 90°/180° requerida para igual precipitación.</p>';
