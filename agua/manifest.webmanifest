@@ -1,0 +1,19 @@
+{
+  "id": "/SYRA/agua/",
+  "name": "SyRA Agua · Diseño y riego eficiente",
+  "short_name": "SyRA Agua",
+  "description": "Uso eficiente del agua en viviendas y jardines de Comodoro Rivadavia",
+  "start_url": "/SYRA/agua/",
+  "scope": "/SYRA/agua/",
+  "display": "standalone",
+  "background_color": "#eef4f5",
+  "theme_color": "#0b6374",
+  "icons": [
+    {
+      "src": "../logosolo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
