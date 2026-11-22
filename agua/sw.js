@@ -1,4 +1,4 @@
-const CACHE='syra-agua-20261122-v1',ASSETS=['./','./index.html','./agua.css','./agua.js','./manifest.webmanifest','../logosolo.png'];
+const CACHE='syra-agua-20261122-v2',ASSETS=['./','./index.html','./agua.css','./agua.js','./manifest.webmanifest','../logosolo.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(async c=>{for(const u of ASSETS){try{await c.add(u)}catch(err){console.warn('No se pudo precargar',u)}}}));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('syra-agua-')&&k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).origin!==location.origin)return;e.respondWith(fetch(e.request).then(r=>{if(r.ok){let x=r.clone();caches.open(CACHE).then(c=>c.put(e.request,x))}return r}).catch(()=>caches.match(e.request).then(r=>r||caches.match('./index.html'))))});
