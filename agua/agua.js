@@ -1,7 +1,7 @@
 /* SyRA Agua · Anteproyecto de riego · 22-11-2026 · sin dependencias remotas ni IA */
 'use strict';
 const $=id=>document.getElementById(id);
-const keys=['proyecto','cesped','personas','domestico','cisterna','lluviaAnual','dias','eto','kc','kl','pe','ea','eg','awc','inf','plantas','goteros','qgot','qrot','fjar','fces','rzces','rzjar','diametro','longitud','bar','estatica','filtro','valvula','otras','friccion'];
+const keys=['proyecto','cesped','personas','domestico','descargas','inodoroBase','inodoroEfic','cisterna','lluviaAnual','dias','eto','kc','kl','pe','ea','eg','awc','inf','plantas','goteros','qgot','qrot','fjar','fces','rzces','rzjar','diametro','longitud','bar','estatica','filtro','valvula','otras','friccion'];
 const n=id=>{let v=Number($(id)?.value);return Number.isFinite(v)?v:0};
 const fmt=(v,d=1)=>Number.isFinite(v)?v.toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
 const ars=v=>Number.isFinite(v)?'$ '+v.toLocaleString('es-AR',{maximumFractionDigits:0}):'—';
@@ -36,6 +36,9 @@ function calcular(){
  const vol=(m2,k,ef)=>m2*lam(k)/(1000*ef);
  const vc=vol(a,kc,ea),vj=vol(j,kl,eg),dom=n('personas')*n('domestico')*days/1000, total=vc+vj+dom;
  const allGrass=vol(verde,kc,ea),allXeric=vol(verde,kl,eg),ahorro=allGrass-(vc+vj);
+ const wcAhorro=Math.max(0,(n('inodoroBase')-n('inodoroEfic'))*n('descargas')*n('personas')*days/1000);
+ $('wcMetrics').innerHTML='<div><strong>'+fmt(wcAhorro,1)+' m³/mes</strong><span>Ahorro del inodoro eficiente</span></div>';
+
  const etaCes=eto*kc,etaJar=eto*kl;
  $('balanceMetrics').innerHTML=[
   ['ETc césped',fmt(etaCes,2)+' mm/día'],['ETL jardín',fmt(etaJar,2)+' mm/día'],['Riego del predio',fmt(vc+vj,1)+' m³/mes'],['Total con viviendas',fmt(total,1)+' m³/mes']
@@ -44,7 +47,7 @@ function calcular(){
  ['Césped ('+fmt(a,0)+' m²)',fmt(lam(kc),1)+' mm',fmt(vc,1)+' m³/mes'],
  ['Jardín ('+fmt(j,0)+' m²)',fmt(lam(kl),1)+' mm',fmt(vj,1)+' m³/mes'],
  ['Uso interno ('+n('personas')+' pers.)','—',fmt(dom,1)+' m³/mes'],
- ['TOTAL','—','<b>'+fmt(total,1)+' m³/mes</b>']]);
+ ['TOTAL antes de cambiar el inodoro','—','<b>'+fmt(total,1)+' m³/mes</b>'],['TOTAL con inodoro eficiente','—','<b>'+fmt(total-wcAhorro,1)+' m³/mes</b>']]);
  $('comparacion').innerHTML=table(['Escenario exterior','m³/mes'],[
  ['Todo césped ('+verde+' m²)',fmt(allGrass,1)],
  ['Mixto: césped + jardín',fmt(vc+vj,1)],
@@ -62,7 +65,7 @@ function calcular(){
  $('tablaRiego').innerHTML+='<p><b>Caudal simultáneo máximo previsto:</b> '+fmt(qmax,2)+' m³/h ('+fmt(qmax*1000/60,1)+' L/min), si corre una estación a la vez. <b>Tasa media del sector de césped:</b> '+fmt(pr,1)+' mm/h. Infiltración de referencia: '+fmt(n('inf'),1)+' mm/h. '+(pr>n('inf')?'<b>Atención: la tasa supera la infiltración supuesta; dividir en ciclos o rediseñar.</b>':'La tasa media no supera la infiltración supuesta, pero debe comprobarse en campo.')+'</p>';
  $('tablaRiego').innerHTML+='<p class="muted">Reserva fácilmente aprovechable (RAW = capacidad de agua disponible × raíz × 0,5), estimación sin lluvia: césped '+fmt(rawC,1)+' mm → '+fmt(intervalC,1)+' días; jardín '+fmt(rawJ,1)+' mm → '+fmt(intervalJ,1)+' días. El valor de p = 0,5 es un supuesto, no una recomendación universal para especies nativas.</p>';
  if(minsJ>240||minsC>240)$('tablaRiego').innerHTML+='<p class="warning">La duración supera cuatro horas por estación: se debe modificar la sectorización, frecuencia o caudal. No se puede copiar tal cual al X-Core.</p>';
- if(a!==400)$('drawing').insertAdjacentHTML('afterbegin','<p class="warning">La cobertura dibujada representa solamente el diseño base de 400 m² de césped. Al cambiar la superficie es obligatorio recalcular las posiciones y cantidad de rotores.</p>');
+ if(a!==400){if(!$('drawing').querySelector('p.warning'))$('drawing').insertAdjacentHTML('afterbegin','<p class="warning">La cobertura dibujada representa solamente el diseño base de 400 m² de césped. Al cambiar la superficie es obligatorio recalcular las posiciones y cantidad de rotores.</p>');}
  else{let w=$('drawing').querySelector('p.warning');if(w)w.remove();}
  const D=n('diametro')/1000,Q=qmax/3600,v=D>0?4*Q/(Math.PI*D*D):0, hf=D>0?n('friccion')*(n('longitud')/D)*(v*v/(2*9.81)):0;
  const pHead=n('bar')*10.197,ht=pHead+n('estatica')+n('filtro')+n('valvula')+n('otras')+hf,kw=1000*9.81*Q*ht/1000,etaPump=.45;
